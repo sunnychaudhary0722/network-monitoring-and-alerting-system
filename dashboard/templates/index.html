@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Network Monitoring System</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.10), transparent 30%),
+                radial-gradient(circle at 90% 20%, rgba(139, 92, 246, 0.10), transparent 30%),
+                #070b16;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           HEADER
+        ========================== */
+
+        header {
+            background: rgba(10, 15, 30, 0.90);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1450px;
+            margin: auto;
+            padding: 22px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+
+            background:
+                linear-gradient(135deg, #2563eb, #7c3aed);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 23px;
+
+            box-shadow:
+                0 0 25px rgba(59,130,246,0.35);
+        }
+
+        .brand h1 {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .brand p {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 3px;
+        }
+
+        .live-pill {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 9px 15px;
+
+            border-radius: 999px;
+
+            background: rgba(34,197,94,0.10);
+            border: 1px solid rgba(34,197,94,0.25);
+
+            color: #4ade80;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+
+            box-shadow: 0 0 12px #22c55e;
+
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* =========================
+           MAIN
+        ========================== */
+
+        main {
+            max-width: 1450px;
+            margin: auto;
+            padding: 35px 30px 60px;
+        }
+
+        .section-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 18px;
+        }
+
+        /* =========================
+           SUMMARY CARDS
+        ========================== */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .summary-card {
+            position: relative;
+            overflow: hidden;
+
+            padding: 25px;
+
+            background: rgba(15,23,42,0.75);
+            border: 1px solid rgba(255,255,255,0.08);
+
+            border-radius: 20px;
+
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+
+            border-color: rgba(96,165,250,0.35);
+
+            box-shadow:
+                0 15px 45px rgba(0,0,0,0.35),
+                0 0 25px rgba(59,130,246,0.08);
+        }
+
+        .summary-card::after {
+            content: "";
+            position: absolute;
+
+            width: 120px;
+            height: 120px;
+
+            right: -50px;
+            top: -50px;
+
+            border-radius: 50%;
+
+            background: rgba(59,130,246,0.12);
+            filter: blur(20px);
+        }
+
+        .summary-label {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .summary-number {
+            font-family: "Space Grotesk", sans-serif;
+
+            font-size: 42px;
+            font-weight: 700;
+
+            margin-top: 10px;
+
+            color: white;
+        }
+
+        .summary-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .blue {
+            color: #60a5fa;
+        }
+
+        .green {
+            color: #4ade80;
+        }
+
+        .red {
+            color: #f87171;
+        }
+
+        /* =========================
+           HOST CARDS
+        ========================== */
+
+        .host-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .host-card {
+            background: rgba(15,23,42,0.80);
+            border: 1px solid rgba(255,255,255,0.08);
+
+            border-radius: 18px;
+            padding: 22px;
+
+            transition: 0.3s ease;
+        }
+
+        .host-card:hover {
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 15px 40px rgba(0,0,0,0.35);
+        }
+
+        .host-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .host-name {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status {
+
+            padding: 6px 11px;
+
+            border-radius: 999px;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            letter-spacing: 0.5px;
+        }
+
+        .status.online {
+
+            background: rgba(34,197,94,0.12);
+            color: #4ade80;
+
+            border: 1px solid rgba(34,197,94,0.25);
+
+            box-shadow: 0 0 15px rgba(34,197,94,0.08);
+        }
+
+        .status.offline {
+
+            background: rgba(239,68,68,0.12);
+            color: #f87171;
+
+            border: 1px solid rgba(239,68,68,0.25);
+
+            box-shadow: 0 0 15px rgba(239,68,68,0.08);
+        }
+
+        .host-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .detail-box {
+
+            background: rgba(255,255,255,0.035);
+
+            border-radius: 12px;
+            padding: 13px;
+
+        }
+
+        .detail-box span {
+
+            display: block;
+
+            color: #64748b;
+            font-size: 11px;
+
+            margin-bottom: 5px;
+
+        }
+
+        .detail-box strong {
+
+            color: #e2e8f0;
+            font-size: 14px;
+
+        }
+
+        /* =========================
+           PANELS
+        ========================== */
+
+        .panel {
+
+            background: rgba(15,23,42,0.78);
+
+            border: 1px solid rgba(255,255,255,0.08);
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.20);
+        }
+
+        .panel-header {
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 22px;
+
+        }
+
+        .panel-title {
+
+            font-family: "Space Grotesk", sans-serif;
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+            color: white;
+
+        }
+
+        .panel-subtitle {
+
+            color: #64748b;
+
+            font-size: 12px;
+
+            margin-top: 4px;
+
+        }
+
+        /* =========================
+           AVAILABILITY
+        ========================== */
+
+        .availability-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(250px, 1fr));
+
+            gap: 18px;
+
+        }
+
+        .availability-card {
+
+            padding: 20px;
+
+            border-radius: 15px;
+
+            background: rgba(255,255,255,0.035);
+
+        }
+
+        .availability-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            margin-bottom: 14px;
+
+        }
+
+        .availability-host {
+
+            color: #cbd5e1;
+
+            font-weight: 600;
+
+        }
+
+        .availability-value {
+
+            color: #4ade80;
+
+            font-weight: 700;
+
+        }
+
+        .progress {
+
+            height: 9px;
+
+            background: #1e293b;
+
+            border-radius: 99px;
+
+            overflow: hidden;
+
+        }
+
+        .progress-bar {
+
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #22c55e,
+                    #34d399
+                );
+
+            border-radius: 99px;
+
+            box-shadow: 0 0 12px rgba(34,197,94,0.4);
+
+            transition: width 1s ease;
+
+        }
+
+        /* =========================
+           ALERTS
+        ========================== */
+
+        .alerts {
+
+            display: grid;
+
+            gap: 10px;
+
+        }
+
+        .alert {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            padding: 15px 18px;
+
+            border-radius: 13px;
+
+            background: rgba(255,255,255,0.035);
+
+            border-left: 4px solid;
+
+        }
+
+        .alert.down {
+
+            border-color: #ef4444;
+
+        }
+
+        .alert.recovered {
+
+            border-color: #22c55e;
+
+        }
+
+        .alert-icon {
+
+            font-size: 20px;
+
+        }
+
+        .alert-info {
+
+            flex: 1;
+
+        }
+
+        .alert-host {
+
+            font-weight: 700;
+
+            color: #e2e8f0;
+
+        }
+
+        .alert-time {
+
+            font-size: 11px;
+
+            color: #64748b;
+
+            margin-top: 3px;
+
+        }
+
+        .alert-label {
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+        }
+
+        .alert-label.down {
+
+            color: #f87171;
+
+        }
+
+        .alert-label.recovered {
+
+            color: #4ade80;
+
+        }
+
+        /* =========================
+           CHART
+        ========================== */
+
+        .chart-container {
+
+            height: 390px;
+
+            position: relative;
+
+        }
+
+        /* =========================
+           TABLE
+        ========================== */
+
+        .table-wrapper {
+
+            overflow-x: auto;
+
+        }
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 750px;
+
+        }
+
+        th {
+
+            text-align: left;
+
+            padding: 14px;
+
+            color: #64748b;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.8px;
+
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+
+        }
+
+        td {
+
+            padding: 15px 14px;
+
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+
+            font-size: 13px;
+
+            color: #cbd5e1;
+
+        }
+
+        tbody tr {
+
+            transition: 0.2s ease;
+
+        }
+
+        tbody tr:hover {
+
+            background: rgba(59,130,246,0.06);
+
+        }
+
+        .offline-row {
+
+            background: rgba(239,68,68,0.08);
+
+        }
+
+        .online-text {
+
+            color: #4ade80;
+
+            font-weight: 700;
+
+        }
+
+        .offline-text {
+
+            color: #f87171;
+
+            font-weight: 700;
+
+        }
+
+        .event-down {
+
+            color: #f87171;
+
+            font-weight: 700;
+
+        }
+
+        .event-recovered {
+
+            color: #4ade80;
+
+            font-weight: 700;
+
+        }
+
+        .event-normal {
+
+            color: #64748b;
+
+        }
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        footer {
+
+            text-align: center;
+
+            color: #475569;
+
+            font-size: 12px;
+
+            padding: 10px 0 35px;
+
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 800px) {
+
+            .header-inner {
+
+                padding: 18px;
+
+            }
+
+            main {
+
+                padding: 25px 18px;
+
+            }
+
+            .summary-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            .brand h1 {
+
+                font-size: 18px;
+
+            }
+
+            .brand p {
+
+                display: none;
+
+            }
+
+            .chart-container {
+
+                height: 300px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="header-inner">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                📡
+            </div>
+
+            <div>
+
+                <h1>Network Monitoring System</h1>
+
+                <p>Real-time infrastructure health & performance</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="live-pill">
+
+            <span class="live-dot"></span>
+
+            LIVE MONITORING
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main>
+
+
+    <!-- =========================
+         OVERVIEW
+    ========================== -->
+
+    <h2 class="section-title">
+        Network Overview
+    </h2>
+
+
+    <div class="summary-grid">
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon blue">
+                🌐
+            </div>
+
+            <div class="summary-label">
+                Total Hosts
+            </div>
+
+            <div class="summary-number">
+                {{ current_hosts|length }}
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon green">
+                ✓
+            </div>
+
+            <div class="summary-label">
+                Online
+            </div>
+
+            <div class="summary-number green">
+
+                {{ hosts | selectattr("status", "equalto", "ONLINE") | list | length }}
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon red">
+                ⚠
+            </div>
+
+            <div class="summary-label">
+                Offline
+            </div>
+
+            <div class="summary-number red">
+
+                {{ hosts | selectattr("status", "equalto", "OFFLINE") | list | length }}
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================
+         HOST STATUS
+    ========================== -->
+
+    <h2 class="section-title">
+        Current Host Status
+    </h2>
+
+
+    <div class="host-grid">
+
+
+        {% for host in hosts %}
+
+        <div class="host-card">
+
+
+            <div class="host-top">
+
+                <div class="host-name">
+                    {{ host.host }}
+                </div>
+
+
+                {% if host.status == "ONLINE" %}
+
+                    <div class="status online">
+                        🟢 ONLINE
+                    </div>
+
+                {% else %}
+
+                    <div class="status offline">
+                        🔴 OFFLINE
+                    </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+            <div class="host-details">
+
+
+                <div class="detail-box">
+
+                    <span>Packet Loss</span>
+
+                    <strong>
+                        {{ host.packet_loss or "N/A" }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span>Latency</span>
+
+                    <strong>
+                        {{ host.latency or "N/A" }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span>Last Checked</span>
+
+                    <strong>
+                        {{ host.timestamp }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span>Event</span>
+
+                    <strong>
+
+                        {% if host.event == "DOWN" %}
+
+                            <span class="offline-text">
+                                DOWN
+                            </span>
+
+                        {% elif host.event == "RECOVERED" %}
+
+                            <span class="online-text">
+                                RECOVERED
+                            </span>
+
+                        {% else %}
+
+                            Normal
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+        {% endfor %}
+
+
+    </div>
+
+
+    <!-- =========================
+         AVAILABILITY
+    ========================== -->
+
+    <div class="panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <div class="panel-title">
+                     Availability Statistics
+                </div>
+
+                <div class="panel-subtitle">
+                    Historical availability based on monitoring checks
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="availability-grid">
+
+
+            {% for stat in statistics %}
+
+            <div class="availability-card">
+
+
+                <div class="availability-top">
+
+                    <span class="availability-host">
+                        {{ stat.host }}
+                    </span>
+
+                    <span class="availability-value">
+                        {{ "%.2f"|format(stat.uptime) }}%
+                    </span>
+
+                </div>
+
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        style="width: {{ stat.uptime }}%;"
+                    ></div>
+
+                </div>
+
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    margin-top:10px;
+                    font-size:11px;
+                    color:#64748b;
+                ">
+
+                    <span>
+                        Uptime
+                    </span>
+
+                    <span>
+                        Downtime: {{ "%.2f"|format(stat.downtime) }}%
+                    </span>
+
+                </div>
+
+
+            </div>
+
+            {% endfor %}
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         ALERTS
+    ========================== -->
+
+    <div class="panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <div class="panel-title">
+                     Recent Alerts
+                </div>
+
+                <div class="panel-subtitle">
+                    Latest connectivity state changes
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="alerts">
+
+
+            {% if alerts %}
+
+
+                {% for alert in alerts %}
+
+
+                <div class="
+                    alert
+                    {% if alert.event == 'DOWN' %}
+                        down
+                    {% else %}
+                        recovered
+                    {% endif %}
+                ">
+
+
+                    <div class="alert-icon">
+
+                        {% if alert.event == "DOWN" %}
+
+                            🔴
+
+                        {% else %}
+
+                            🟢
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="alert-info">
+
+                        <div class="alert-host">
+                            {{ alert.host }}
+                        </div>
+
+                        <div class="alert-time">
+                            {{ alert.timestamp }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="
+                        alert-label
+                        {% if alert.event == 'DOWN' %}
+                            down
+                        {% else %}
+                            recovered
+                        {% endif %}
+                    ">
+
+                        {{ alert.event }}
+
+                    </div>
+
+
+                </div>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <div style="
+                    padding:25px;
+                    text-align:center;
+                    color:#64748b;
+                ">
+
+                    ✓ No DOWN or RECOVERED alerts
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         LATENCY
+    ========================== -->
+
+    <div class="panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <div class="panel-title">
+                     Latency Monitoring
+                </div>
+
+                <div class="panel-subtitle">
+                    Real-time network response performance
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-container">
+
+            <canvas id="latencyChart"></canvas>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================
+         LOGS
+    ========================== -->
+
+    <div class="panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <div class="panel-title">
+                     Recent Monitoring Logs
+                </div>
+
+                <div class="panel-subtitle">
+                    Latest network monitoring activity
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+
+            <table>
+
+
+                <thead>
+
+                    <tr>
+
+                        <th>Time</th>
+                        <th>Host</th>
+                        <th>Status</th>
+                        <th>Packet Loss</th>
+                        <th>Latency</th>
+                        <th>Event</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    {% for log in logs %}
+
+
+                    <tr class="
+                        {% if log.status == 'OFFLINE' %}
+                            offline-row
+                        {% endif %}
+                    ">
+
+
+                        <td>
+                            {{ log.timestamp }}
+                        </td>
+
+
+                        <td>
+                            <strong>
+                                {{ log.host }}
+                            </strong>
+                        </td>
+
+
+                        <td>
+
+                            {% if log.status == "ONLINE" %}
+
+                                <span class="online-text">
+                                    🟢 ONLINE
+                                </span>
+
+                            {% else %}
+
+                                <span class="offline-text">
+                                    🔴 OFFLINE
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+                            {{ log.packet_loss or "N/A" }}
+                        </td>
+
+
+                        <td>
+                            {{ log.latency or "N/A" }}
+                        </td>
+
+
+                        <td>
+
+                            {% if log.event == "DOWN" %}
+
+                                <span class="event-down">
+                                    DOWN
+                                </span>
+
+                            {% elif log.event == "RECOVERED" %}
+
+                                <span class="event-recovered">
+                                    RECOVERED
+                                </span>
+
+                            {% else %}
+
+                                <span class="event-normal">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+    </div>
+
+
+</main>
+
+
+<footer>
+
+    Network Monitoring System • Built with Python, Flask, SQLite & Chart.js
+
+</footer>
+
+
+
+<script>
+
+
+/* ==========================================
+   LATENCY CHART
+========================================== */
+
+
+const currentHosts = {{ current_hosts | tojson }};
+
+const latencyData = {{ latency_data | tojson }};
+
+
+const datasets = currentHosts.map((host, index) => {
+
+
+    return {
+
+        label: host,
+
+        data: latencyData
+
+            .filter(item => item.host === host)
+
+            .map(item => ({
+
+                x: item.timestamp,
+
+                y: item.latency
+
+            })),
+
+        tension: 0.35,
+
+        fill: false,
+
+        borderWidth: 2,
+
+        pointRadius: 3,
+
+        pointHoverRadius: 7
+
+    };
+
+
+});
+
+
+new Chart(
+
+    document.getElementById("latencyChart"),
+
+    {
+
+        type: "line",
+
+        data: {
+
+            datasets: datasets
+
+        },
+
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+
+            interaction: {
+
+                mode: "nearest",
+
+                intersect: false
+
+            },
+
+
+            plugins: {
+
+                legend: {
+
+                    display: true,
+
+                    position: "bottom",
+
+                    labels: {
+
+                        color: "#94a3b8",
+
+                        usePointStyle: true,
+
+                        padding: 20,
+
+                        font: {
+
+                            family: "Inter",
+
+                            size: 12
+
+                        }
+
+                    }
+
+                },
+
+
+                tooltip: {
+
+                    backgroundColor: "#0f172a",
+
+                    borderColor: "rgba(255,255,255,0.1)",
+
+                    borderWidth: 1,
+
+                    titleColor: "#ffffff",
+
+                    bodyColor: "#cbd5e1",
+
+                    padding: 12,
+
+                    displayColors: true
+
+                }
+
+            },
+
+
+            scales: {
+
+                x: {
+
+                    type: "category",
+
+                    grid: {
+
+                        color: "rgba(255,255,255,0.04)"
+
+                    },
+
+                    ticks: {
+
+                        color: "#64748b",
+
+                        maxTicksLimit: 10
+
+                    },
+
+                    title: {
+
+                        display: true,
+
+                        text: "Time",
+
+                        color: "#64748b"
+
+                    }
+
+                },
+
+
+                y: {
+
+                    beginAtZero: true,
+
+                    grid: {
+
+                        color: "rgba(255,255,255,0.05)"
+
+                    },
+
+                    ticks: {
+
+                        color: "#64748b"
+
+                    },
+
+                    title: {
+
+                        display: true,
+
+                        text: "Latency (ms)",
+
+                        color: "#64748b"
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+);
+
+
+
+/* ==========================================
+   AUTO REFRESH
+========================================== */
+
+
+setTimeout(function() {
+
+    location.reload();
+
+}, 5000);
+
+
+</script>
+
+
+</body>
+
+</html>
