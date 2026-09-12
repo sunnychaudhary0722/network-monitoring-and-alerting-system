@@ -1,4 +1,4 @@
-<img width="502" height="368" alt="image" src="https://github.com/user-attachments/assets/c564dbdf-1711-483e-9340-bf38acef332f" /># Network Monitoring and Alerting System
+# Network Monitoring and Alerting System
 
 A Python-based network monitoring and alerting system that continuously monitors configured hosts, measures network performance, detects status changes, stores monitoring data, and provides a web-based dashboard for visualization and analysis.
 
